@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainy Downloader</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                url("/static/background.png") center center / cover no-repeat fixed;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .page {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px;
+            isolation: isolate;
+        }
+
+        /* Боковые изображения */
+
+        .side-image {
+            position: absolute;
+            z-index: -1;
+            pointer-events: none;
+            user-select: none;
+            filter: grayscale(100%) contrast(1.3);
+        }
+
+        .left-image {
+            left: 0;
+            bottom: 0;
+            width: min(31vw, 500px);
+            opacity: 0.58;
+            -webkit-mask-image:
+                linear-gradient(to right, black 55%, transparent 100%),
+                linear-gradient(to top, black 65%, transparent 100%);
+            mask-image:
+                linear-gradient(to right, black 55%, transparent 100%);
+        }
+
+        .right-image {
+            right: 0;
+            bottom: 0;
+            width: min(29vw, 470px);
+            opacity: 0.55;
+            -webkit-mask-image:
+                linear-gradient(to left, black 55%, transparent 100%);
+            mask-image:
+                linear-gradient(to left, black 55%, transparent 100%);
+        }
+
+        /* Декоративные кресты */
+
+        .cross {
+            position: absolute;
+            z-index: -1;
+            color: rgba(255,255,255,0.16);
+            font-family: Georgia, serif;
+            pointer-events: none;
+        }
+
+        .cross-1 {
+            left: 8%;
+            top: 13%;
+            font-size: 65px;
+        }
+
+        .cross-2 {
+            right: 9%;
+            top: 14%;
+            font-size: 90px;
+            transform: rotate(3deg);
+        }
+
+        .cross-3 {
+            right: 24%;
+            bottom: 10%;
+            font-size: 48px;
+            opacity: .5;
+        }
+
+        /* Центральная часть */
+
+        .content {
+            width: 100%;
+            max-width: 760px;
+            text-align: center;
+        }
+
+        .symbol {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 22px;
+            border: 1px solid #555;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Georgia, serif;
+            font-size: 46px;
+            color: #ddd;
+            box-shadow: 0 0 35px rgba(255,255,255,.05);
+        }
+     h1 {
+    font-family: "Metal Mania", system-ui;
+    font-size: clamp(48px, 5vw, 76px);
+    font-weight: 500;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(255,255,255,.25);
+           }
+
+        .subtitle {
+            color: #8f8f8f;
+            font-size: 17px;
+            margin-bottom: 38px;
+        }
+
+        /* Форма */
+
+        .download-card {
+            background: rgba(13,13,13,.88);
+            border: 1px solid #292929;
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow:
+                0 25px 80px rgba(0,0,0,.65),
+                inset 0 1px rgba(255,255,255,.025);
+            backdrop-filter: blur(8px);
+        }
+
+        .url-input {
+            width: 100%;
+            height: 64px;
+            background: #090909;
+            border: 1px solid #343434;
+            border-radius: 14px;
+            padding: 0 20px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: .2s;
+        }
+
+        .url-input:focus {
+            border-color: #777;
+            box-shadow: 0 0 0 3px rgba(255,255,255,.04);
+        }
+
+        .url-input::placeholder {
+            color: #555;
+        }
+
+        .format-title {
+            margin: 25px 0 12px;
+            text-align: left;
+            color: #8c8c8c;
+            font-size: 13px;
+            letter-spacing: 2px;
+        }
+
+        .formats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .formats input {
+            display: none;
+        }
+
+        .formats label {
+            height: 58px;
+            border: 1px solid #333;
+            border-radius: 13px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            color: #aaa;
+            transition: .2s;
+            background: #0b0b0b;
+        }
+
+        .formats label:hover {
+            border-color: #666;
+            color: #fff;
+        }
+
+        .formats input:checked + span {
+            background: #f1f1f1;
+            color: #050505;
+            border-color: #fff;
+        }
+
+        .formats span {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .download-button {
+            width: 100%;
+            height: 64px;
+            margin-top: 24px;
+            border: none;
+            border-radius: 13px;
+            background: #f1f1f1;
+            color: #050505;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .download-button:hover {
+            background: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(255,255,255,.10);
+        }
+
+        .info {
+            margin-top: 27px;
+            color: #555;
+            font-family: Georgia, serif;
+            letter-spacing: 1px;
+        }
+
+        /* Телефон */
+
+        @media (max-width: 800px) {
+            .side-image {
+                opacity: .22;
+            }
+
+            .left-image {
+                width: 55vw;
+            }
+
+            .right-image {
+                width: 50vw;
+            }
+
+            .cross {
+                opacity: .35;
+            }
+
+            .download-card {
+                padding: 20px;
+            }
+
+            h1 {
+                letter-spacing: 2px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .formats {
+                gap: 6px;
+            }
+
+            .formats label {
+                height: 52px;
+                font-size: 15px;
+            }
+
+            .symbol {
+                width: 65px;
+                height: 65px;
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+        }.formats label:hover {
+    border-color: #aaa;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+.download-button:hover {
+    background: #ffffff;
+    box-shadow: 0 0 32px rgba(255, 255, 255, 0.55);
+    transform: translateY(-2px);
+}
+.download-button {
+    font-family: "Metal Mania", system-ui;
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+.video-preview {
+   display: none;
+flex-direction: row;
+    margin: 14px 0 18px;
+    padding: 10px;
+    border: 1px solid #444;
+    background: rgba(0, 0, 0, 0.75);
+    align-items: center;
+    gap: 16px;
+}
+
+.video-preview img {
+    width: 150px;
+    height: 84px;
+    object-fit: cover;
+    border: 1px solid #777;
+    flex-shrink: 0;
+}
+
+#preview-title {
+    font-family: "Metal Mania", system-ui;
+    font-size: 18px;
+    color: #fff;
+    text-align: left;
+    line-height: 1.25;
+    flex: 1;
+}
+.footer {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 11px;
+    opacity: 0.35;
+}
+
+.footer a {
+    color: #aaa;
+    text-decoration: none;
+    margin: 0 6px;
+}
+
+.footer a:hover {
+    color: #fff;
+    opacity: 1;
+}
+.support-area {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.support-button {
+    display: inline-block;
+    padding: 10px 24px;
+    border: 1px solid #555;
+    color: #aaa;
+    text-decoration: none;
+    font-family: "Metal Mania", system-ui;
+    font-size: 15px;
+    letter-spacing: 1px;
+    background: rgba(0, 0, 0, 0.65);
+    transition: 0.25s;
+}
+
+.support-button:hover {
+    color: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+}
+.download-button.processing {
+    cursor: wait;
+    opacity: 0.8;
+    animation: processingPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes processingPulse {
+    0%, 100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.45);
+    }
+}
+.download-error {
+    display: none;
+    margin-top: 14px;
+    padding: 11px 14px;
+    border: 1px solid #555;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ccc;
+    font-family: "Metal Mania", system-ui;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.download-error.show {
+    display: block;
+}
+.url-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.url-wrapper .url-input {
+    padding-right: 90px;
+}
+
+.paste-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #777;
+    font-family: "Metal Mania", system-ui;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 10px;
+    transition: 0.2s;
+}
+
+.paste-button:hover {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <img src="/static/left.jpg" class="side-image left-image" alt="">
+    <img src="/static/right.jpg" class="side-image right-image" alt="">
+
+    <div class="cross cross-1">†</div>
+    <div class="cross cross-2">✝</div>
+    <div class="cross cross-3">†</div>
+
+    <main class="content">
+
+        <div class="symbol">†</div>
+
+        <h1>RAINY DOWNLOADER</h1>
+
+        <p class="subtitle">
+            Скачивайте видео и аудио быстро и просто
+        </p>
+
+        <div class="download-card">
+
+            <form action="/download" method="post">
+
+
+               <div class="url-wrapper">
+    <input
+        class="url-input"
+        type="text"
+        name="url"
+        placeholder="Вставьте ссылку на видео"
+        required
+    >
+    <button type="button" class="paste-button" id="paste-button">PASTE</button>
+</div>
+<div id="video-preview" class="video-preview">
+    <img id="preview-image" src="" alt="">
+    <div id="preview-title"></div>
+</div>
+
+                <div class="format-title">ФОРМАТ</div>
+
+                <div class="formats">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="format"
+                            value="mp4"
+                            checked
+                        >
+                        <span>MP4</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="format"
+                            value="mp3"
+                        >
+                        <span>MP3</span>
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="format"
+                            value="wav"
+                        >
+                        <span>WAV</span>
+                    </label>
+
+                </div>
+
+<button
+    class="download-button"
+    type="submit"
+    id="download-button"
+>
+    Download
+</button>
+
+
+<div id="download-error" class="download-error"></div>
+
+            </form>
+
+        </div>
+
+        <div class="info">
+            MP4 · MP3 · WAV
+        </div>
+
+<div class="support-area">
+    <a href="https://buymeacoffee.com/rainy_downloader"
+       target="_blank"
+       class="support-button">
+         SUPPORT
+    </a>
+</div>
+
+    
+<footer class="footer">
+    <a href="/privacy">Privacy</a>
+    <span>·</span>
+    <a href="/terms">Terms</a>
+</footer>
+</main>
+
+<img src="/static/left.jpg" class="side-image left-image">
+<img src="/static/right.jpg" class="side-image right-image">
+
+</div>
+<script>
+const urlInput = document.querySelector('.url-input');
+const pasteButton = document.querySelector('.paste-button');
+
+pasteButton.addEventListener('click', async () => {
+    try {
+        const text = await navigator.clipboard.readText();
+        urlInput.value = text;
+        urlInput.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (error) {
+        urlInput.focus();
+    }
+});
+const preview = document.getElementById('video-preview');
+const previewImage = document.getElementById('preview-image');
+const previewTitle = document.getElementById('preview-title');
+const downloadError = document.getElementById('download-error');
+
+let timer;
+
+urlInput.addEventListener('input', () => {
+    clearTimeout(timer);
+
+    const url = urlInput.value.trim();
+
+    if (!url) {
+        preview.style.display = 'none';
+        return;
+    }
+
+    timer = setTimeout(async () => {
+        try {
+            const formData = new FormData();
+            formData.append('url', url);
+
+            const response = await fetch('/preview', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                preview.style.display = 'none';
+                return;
+            }
+
+            previewImage.src = data.thumbnail;
+            previewTitle.textContent = data.title;
+            preview.style.display = 'flex';
+
+        } catch (error) {
+            preview.style.display = 'none';
+        }
+    }, 600);
+});
+const downloadButton = document.getElementById('download-button');
+const downloadForm = downloadButton.closest('form');
+
+downloadForm.addEventListener('submit', async (event) => {
+downloadError.textContent = '';
+downloadError.classList.remove('show');
+    event.preventDefault();
+const url = urlInput.value.trim();
+
+if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+    downloadError.textContent = 'INVALID LINK';
+    downloadError.classList.add('show');
+    return;
+}
+    downloadButton.textContent = 'PROCESSING...';
+    downloadButton.disabled = true;
+    downloadButton.classList.add('processing');
+
+    try {
+        const formData = new FormData(downloadForm);
+
+        const response = await fetch('/download', {
+            method: 'POST',
+            body: formData
+        });
+          if (!response.ok) {
+    if (response.status === 404) {
+        throw new Error('VIDEO_UNAVAILABLE');
+    }
+
+    throw new Error('DOWNLOAD_FAILED');
+}
+        
+        const blob = await response.blob();
+
+        const disposition = response.headers.get('Content-Disposition');
+        let filename = 'download';
+
+        if (disposition) {
+            const match = disposition.match(/filename="?([^"]+)"?/);
+            if (match) filename = match[1];
+        }
+
+        const fileUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = fileUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(fileUrl);
+
+    } catch (error) {
+       if (error.message === 'VIDEO_UNAVAILABLE') {
+    downloadError.textContent = 'VIDEO UNAVAILABLE';
+} else {
+    downloadError.textContent = 'DOWNLOAD FAILED — PLEASE TRY AGAIN';
+}
+
+downloadError.classList.add('show');
+    } finally {
+        downloadButton.textContent = 'DOWNLOAD';
+        downloadButton.disabled = false;
+        downloadButton.classList.remove('processing');
+    }
+});
+</script>
+
+</body>
+</html>
