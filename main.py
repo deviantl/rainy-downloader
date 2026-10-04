@@ -17,6 +17,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
+COOKIE_FILE = "/etc/secrets/youtube_cookies.txt"
+
 
 
 @app.get("/")
@@ -46,6 +48,7 @@ def preview(url: str = Form(...)):
             "quiet": True,
             "skip_download": True,
             "noplaylist": True,
+            "cookiefile": COOKIE_FILE,
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
@@ -86,6 +89,7 @@ def download(
             "merge_output_format": "mp4",
             "outtmpl": output,
             "noplaylist": True,
+            "cookiefile": COOKIE_FILE,
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
@@ -115,6 +119,7 @@ def download(
             "format": "bestaudio/best",
             "outtmpl": output,
             "noplaylist": True,
+            "cookiefile": COOKIE_FILE,
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -149,6 +154,7 @@ def download(
             "format": "bestaudio/best",
             "outtmpl": output,
             "noplaylist": True,
+            "cookiefile": COOKIE_FILE,
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
