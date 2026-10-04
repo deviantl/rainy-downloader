@@ -17,7 +17,13 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-COOKIE_FILE = "/etc/secrets/youtube_cookies.txt"
+SECRET_COOKIE_FILE = "/etc/secrets/youtube_cookies.txt"
+COOKIE_FILE = "/tmp/youtube_cookies.txt"
+
+import shutil
+
+if os.path.exists(SECRET_COOKIE_FILE):
+    shutil.copyfile(SECRET_COOKIE_FILE, COOKIE_FILE)
 
 
 
