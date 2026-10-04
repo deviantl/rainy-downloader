@@ -456,9 +456,7 @@ flex-direction: row;
     <img src="/static/left.jpg" class="side-image left-image" alt="">
     <img src="/static/right.jpg" class="side-image right-image" alt="">
 
-    <div class="cross cross-1">†</div>
-    <div class="cross cross-2">✝</div>
-    <div class="cross cross-3">†</div>
+ 
 
     <main class="content">
 
@@ -543,13 +541,11 @@ flex-direction: row;
             MP4 · MP3 · WAV
         </div>
 
-<div class="support-area">
-    <a href="https://buymeacoffee.com/rainy_downloader"
-       target="_blank"
-       class="support-button">
-         SUPPORT
-    </a>
-</div>
+   <div class="support-area">
+    <a href="https://band.link/rr05" target="_blank" class="support-button">MUSIC</a>
+    <a href="https://ko-fi.com/rainy005" target="_blank" class="support-button">SUPPORT</a>
+    <a href="https://t.me/Rainyy05" target="_blank" class="support-button">TELEGRAM</a>
+ </div>
 
     
 <footer class="footer">
@@ -559,18 +555,34 @@ flex-direction: row;
 </footer>
 </main>
 
-<img src="/static/left.jpg" class="side-image left-image">
-<img src="/static/right.jpg" class="side-image right-image">
 
 </div>
 <script>
 const urlInput = document.querySelector('.url-input');
 const pasteButton = document.querySelector('.paste-button');
+function updatePasteButton() {
+    if (urlInput.value.trim()) {
+        pasteButton.textContent = '×';
+        pasteButton.classList.add('clear-mode');
+    } else {
+        pasteButton.textContent = 'PASTE';
+        pasteButton.classList.remove('clear-mode');
+    }
+}
 
 pasteButton.addEventListener('click', async () => {
+    if (urlInput.value.trim()) {
+        urlInput.value = '';
+        updatePasteButton();
+        urlInput.dispatchEvent(new Event('input', { bubbles: true }));
+        urlInput.focus();
+        return;
+    }
+
     try {
         const text = await navigator.clipboard.readText();
         urlInput.value = text;
+        updatePasteButton();
         urlInput.dispatchEvent(new Event('input', { bubbles: true }));
     } catch (error) {
         urlInput.focus();
@@ -585,7 +597,7 @@ let timer;
 
 urlInput.addEventListener('input', () => {
     clearTimeout(timer);
-
+    updatePasteButton();
     const url = urlInput.value.trim();
 
     if (!url) {
