@@ -55,7 +55,14 @@ def preview(url: str = Form(...)):
             "skip_download": True,
             "noplaylist": True,
             "remote_components": {"ejs:github"},
-            "extractor_args": {"youtube": {"player_client": ["android_vr"]}},
+            "extractor_args": {
+    "youtube": {
+        "player_client": ["mweb"],
+    },
+    "youtubepot-bgutilhttp": {
+        "base_url": ["http://127.0.0.1:4416"],
+    },
+},
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
