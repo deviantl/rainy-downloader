@@ -52,8 +52,7 @@ def terms(request: Request):
 def preview(url: str = Form(...)):
     try:
         options = {
-            "quiet": False,
-            "verbose": True,
+            "quiet": True,
             "skip_download": True,
             "noplaylist": True,
             "proxy": YOUTUBE_PROXY,
