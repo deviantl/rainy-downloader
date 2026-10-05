@@ -51,7 +51,8 @@ def terms(request: Request):
 def preview(url: str = Form(...)):
     try:
         options = {
-            "quiet": True,
+            "quiet": False,
+            "verbose": True,
             "skip_download": True,
             "noplaylist": True,
             "remote_components": {"ejs:github"},
