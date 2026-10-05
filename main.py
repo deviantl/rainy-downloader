@@ -18,7 +18,7 @@ DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 SECRET_COOKIE_FILE = "/etc/secrets/youtube_cookies.txt"
-COOKIE_FILE = "/tmp/youtube_cookies.txt"
+COOKIE_FILE = "/tmp/youtube_cookies.txt" if os.name != "nt" else os.path.join(os.path.dirname(__file__), "youtube_cookies.txt")
 
 import shutil
 
