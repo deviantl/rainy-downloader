@@ -15,6 +15,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 DOWNLOAD_DIR = "downloads"
+YOUTUBE_PROXY = os.getenv("YOUTUBE_PROXY")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 SECRET_COOKIE_FILE = "/etc/secrets/youtube_cookies.txt"
@@ -55,6 +56,7 @@ def preview(url: str = Form(...)):
             "verbose": True,
             "skip_download": True,
             "noplaylist": True,
+            "proxy": YOUTUBE_PROXY,
             "remote_components": {"ejs:github"},
             "extractor_args": {
     "youtube": {
