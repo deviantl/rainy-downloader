@@ -97,7 +97,7 @@ def download(
             "outtmpl": output,
             "noplaylist": True,
             "cookiefile": COOKIE_FILE,
-            "remote_components": {"ejs:github"},і
+            "remote_components": {"ejs:github": "github"},
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
