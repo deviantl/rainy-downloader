@@ -54,7 +54,6 @@ def preview(url: str = Form(...)):
             "quiet": True,
             "skip_download": True,
             "noplaylist": True,
-            "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github"},
             "extractor_args": {"youtube": {"player_client": ["android_vr"]}},
         }
