@@ -118,10 +118,28 @@ def download(
             "remote_components": {"ejs:github": "github"},
         }
 
-        with yt_dlp.YoutubeDL(options) as ydl:
-            info = ydl.extract_info(url, download=True)
-            filename = ydl.prepare_filename(info)
+        proxies = [YOUTUBE_PROXY, YOUTUBE_PROXY_BACKUP]
+        info = None
+        filename = None
 
+        for proxy in proxies:
+            if not proxy:
+                continue
+
+            try:
+                options["proxy"] = proxy
+
+                with yt_dlp.YoutubeDL(options) as ydl:
+                    info = ydl.extract_info(url, download=True)
+                    filename = ydl.prepare_filename(info)
+
+                break
+            except Exception:
+                continue
+
+        if info is None or filename is None:
+            raise Exception("All proxies failed")
+        
         base = os.path.splitext(filename)[0]
         mp4_file = base + ".mp4"
 
