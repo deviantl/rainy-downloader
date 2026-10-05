@@ -16,6 +16,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 DOWNLOAD_DIR = "downloads"
 YOUTUBE_PROXY = os.getenv("YOUTUBE_PROXY")
+YOUTUBE_PROXY_BACKUP = os.getenv("YOUTUBE_PROXY_BACKUP")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 SECRET_COOKIE_FILE = "/etc/secrets/youtube_cookies.txt"
@@ -47,38 +48,45 @@ def terms(request: Request):
         name="terms.html"
     )
 
-
 @app.post("/preview")
 def preview(url: str = Form(...)):
-    try:
-        options = {
-            "quiet": True,
-            "skip_download": True,
-            "noplaylist": True,
-            "proxy": YOUTUBE_PROXY,
-            "remote_components": {"ejs:github"},
-            "extractor_args": {
-    "youtube": {
-        "player_client": ["mweb"],
-    },
-    "youtubepot-bgutilhttp": {
-        "base_url": ["http://127.0.0.1:4416"],
-    },
-},
-        }
+    proxies = [YOUTUBE_PROXY, YOUTUBE_PROXY_BACKUP]
 
-        with yt_dlp.YoutubeDL(options) as ydl:
-            info = ydl.extract_info(url, download=False)
+    for proxy in proxies:
+        if not proxy:
+            continue
 
-        return {
-            "title": info.get("title", "Unknown"),
-            "thumbnail": info.get("thumbnail", "")
-        }
+        try:
+            options = {
+                "quiet": True,
+                "skip_download": True,
+                "noplaylist": True,
+                "proxy": proxy,
+                "remote_components": {"ejs:github"},
+                "extractor_args": {
+                    "youtube": {
+                        "player_client": ["mweb"],
+                    },
+                    "youtubepot-bgutilhttp": {
+                        "base_url": ["http://127.0.0.1:4416"],
+                    },
+                },
+            }
 
-    except Exception:
-        return {
-            "error": "Не удалось получить информацию о видео"
-        }
+            with yt_dlp.YoutubeDL(options) as ydl:
+                info = ydl.extract_info(url, download=False)
+
+            return {
+                "title": info.get("title", "Unknown"),
+                "thumbnail": info.get("thumbnail", "")
+            }
+
+        except Exception:
+            continue
+
+    return {
+        "error": "Не удалось получить информацию о видео"
+    }
 
 
 @app.post("/download")
