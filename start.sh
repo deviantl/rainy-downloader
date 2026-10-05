@@ -1,2 +1,3 @@
-deno run --allow-net --allow-read --allow-env bgutil-yt-dlp-pot-provider/server/src/main.ts &
+cd bgutil-ytdlp-pot-provider/server && npm install && cd ../..
+deno run --allow-net --allow-read --allow-env --allow-ffi bgutil-ytdlp-pot-provider/server/src/main.ts &
 uvicorn main:app --host 0.0.0.0 --port $PORT
