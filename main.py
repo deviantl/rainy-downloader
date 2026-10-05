@@ -56,6 +56,7 @@ def preview(url: str = Form(...)):
             "noplaylist": True,
             "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github"},
+            "extractor_args": {"youtube": {"player_client": ["android_vr"]}},
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
