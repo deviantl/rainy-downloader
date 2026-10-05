@@ -106,6 +106,7 @@ def download(
             "merge_output_format": "mp4",
             "outtmpl": output,
             "noplaylist": True,
+            "proxy": YOUTUBE_PROXY,
             "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github": "github"},
         }
@@ -137,6 +138,7 @@ def download(
             "format": "bestaudio/best",
             "outtmpl": output,
             "noplaylist": True,
+            "proxy": YOUTUBE_PROXY,
             "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github"},
             "postprocessors": [
@@ -173,6 +175,7 @@ def download(
             "format": "bestaudio/best",
             "outtmpl": output,
             "noplaylist": True,
+            "proxy": YOUTUBE_PROXY,
             "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github"},
             "postprocessors": [
