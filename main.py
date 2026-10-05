@@ -55,6 +55,7 @@ def preview(url: str = Form(...)):
             "skip_download": True,
             "noplaylist": True,
             "cookiefile": COOKIE_FILE,
+            "remote_components": {"ejs:github"},
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
@@ -96,6 +97,7 @@ def download(
             "outtmpl": output,
             "noplaylist": True,
             "cookiefile": COOKIE_FILE,
+            "remote_components": {"ejs:github"},і
         }
 
         with yt_dlp.YoutubeDL(options) as ydl:
@@ -126,6 +128,7 @@ def download(
             "outtmpl": output,
             "noplaylist": True,
             "cookiefile": COOKIE_FILE,
+            "remote_components": {"ejs:github"},
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -161,6 +164,7 @@ def download(
             "outtmpl": output,
             "noplaylist": True,
             "cookiefile": COOKIE_FILE,
+            "remote_components": {"ejs:github"},
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
