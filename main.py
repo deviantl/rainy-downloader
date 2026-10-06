@@ -156,11 +156,14 @@ async def download(
             filename = mp4_file
 
         return FileResponse(
-            filename,
-            media_type="video/mp4",
-            filename="video.mp4",
-            background=BackgroundTask(os.remove, filename)
-        )
+    filename,
+    media_type="video/mp4",
+    filename="video.mp4",
+    background=BackgroundTasks([
+        BackgroundTask(os.remove, filename),
+        BackgroundTask(release_download_lock)
+    ])
+)
 
     # MP3
     elif format == "mp3":
@@ -209,15 +212,17 @@ async def download(
             DOWNLOAD_DIR,
             file_id + ".mp3"
         )
-
-        return FileResponse(
-    filename,
-    media_type="audio/mpeg",
-    filename="audio.mp3",
-    background=BackgroundTask(os.remove, filename)
-)
+    return FileResponse(
+        filename,
+        media_type="audio/mpeg",
+        filename="audio.mp3",
+        background=BackgroundTasks([
+            BackgroundTask(os.remove, filename),
+            BackgroundTask(release_download_lock)
+        ])
+    )
     # WAV
-    elif format == "wav":
+    if format == "wav":
         output = os.path.join(
             DOWNLOAD_DIR,
             file_id + ".%(ext)s"
@@ -247,8 +252,11 @@ async def download(
         )
 
         return FileResponse(
-            filename,
-            media_type="audio/wav",
-            filename="audio.wav",
-            background=BackgroundTask(os.remove, filename)
-        )   
+    filename,
+    media_type="audio/wav",
+    filename="audio.wav",
+    background=BackgroundTasks([
+        BackgroundTask(os.remove, filename),
+        BackgroundTask(release_download_lock)
+    ])
+) 
