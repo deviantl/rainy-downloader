@@ -308,6 +308,7 @@ def ytdlp_test():
         "quiet": True,
         "skip_download": True,
         "noplaylist": True,
+        "cookiefile": COOKIE_FILE,
         "remote_components": {"ejs:github"},
         "extractor_args": {
             "youtube": {
