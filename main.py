@@ -150,7 +150,7 @@ def download(
         return FileResponse(
             filename,
             media_type="video/mp4",
-            filename="video.mp4"
+            filename="video.mp4",
             background=BackgroundTask(os.remove, filename)
         )
 
@@ -238,9 +238,9 @@ def download(
             file_id + ".wav"
         )
 
-       return FileResponse(
-    filename,
-    media_type="audio/wav",
-    filename="audio.wav",
-    background=BackgroundTask(os.remove, filename)
-)
+        return FileResponse(
+            filename,
+            media_type="audio/wav",
+            filename="audio.wav",
+            background=BackgroundTask(os.remove, filename)
+        )   
