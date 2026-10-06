@@ -4,6 +4,7 @@ import yt_dlp
 
 from fastapi import FastAPI, Form
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
@@ -150,6 +151,7 @@ def download(
             filename,
             media_type="video/mp4",
             filename="video.mp4"
+            background=BackgroundTask(os.remove, filename)
         )
 
     # MP3
@@ -201,11 +203,11 @@ def download(
         )
 
         return FileResponse(
-            filename,
-            media_type="audio/mpeg",
-            filename="audio.mp3"
-        )
-
+    filename,
+    media_type="audio/mpeg",
+    filename="audio.mp3",
+    background=BackgroundTask(os.remove, filename)
+)
     # WAV
     elif format == "wav":
         output = os.path.join(
@@ -236,8 +238,9 @@ def download(
             file_id + ".wav"
         )
 
-        return FileResponse(
-            filename,
-            media_type="audio/wav",
-            filename="audio.wav"
-        )
+       return FileResponse(
+    filename,
+    media_type="audio/wav",
+    filename="audio.wav",
+    background=BackgroundTask(os.remove, filename)
+)
