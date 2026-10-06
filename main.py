@@ -300,3 +300,36 @@ def server_test():
         return {
             "error": str(e)
         }
+@app.get("/ytdlp-test")
+def ytdlp_test():
+    test_url = "https://www.youtube.com/watch?v=fn6aI4W6MAc"
+
+    options = {
+        "quiet": True,
+        "skip_download": True,
+        "noplaylist": True,
+        "remote_components": {"ejs:github"},
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["mweb"],
+            },
+            "youtubepot-bgutilhttp": {
+                "base_url": ["http://127.0.0.1:4416"],
+            },
+        },
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(test_url, download=False)
+
+        return {
+            "success": True,
+            "title": info.get("title")
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
