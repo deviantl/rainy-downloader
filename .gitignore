@@ -2,4 +2,5 @@ venv/
 __pycache__/
 downloads/
 *.pyc
-.envyoutube_cookies.txt
+.env
+youtube_cookies.txt
