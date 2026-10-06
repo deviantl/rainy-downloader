@@ -176,7 +176,6 @@ async def download(
             "format": "bestaudio/best",
             "outtmpl": output,
             "noplaylist": True,
-            "proxy": YOUTUBE_PROXY,
             "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github"},
             "postprocessors": [
@@ -191,40 +190,43 @@ async def download(
         proxies = [YOUTUBE_PROXY, YOUTUBE_PROXY_BACKUP]
         downloaded = False
 
-    for proxy in proxies:
-        if not proxy:
-            continue
+        for proxy in proxies:
+            if not proxy:
+                continue
 
-        try:
-            options["proxy"] = proxy
+            try:
+                options["proxy"] = proxy
 
-            with yt_dlp.YoutubeDL(options) as ydl:
-                ydl.extract_info(url, download=True)
+                with yt_dlp.YoutubeDL(options) as ydl:
+                    ydl.extract_info(url, download=True)
 
-            downloaded = True
-            break
+                downloaded = True
+                break
 
-        except Exception as e:
-            print("PROXY DOWNLOAD ERROR:", repr(e), flush=True)
-            continue
-           
+            except Exception as e:
+                print("PROXY DOWNLOAD ERROR:", repr(e), flush=True)
+                continue
+
         if not downloaded:
             raise Exception("All proxies failed")
+
         filename = os.path.join(
             DOWNLOAD_DIR,
             file_id + ".mp3"
         )
-    return FileResponse(
-        filename,
-        media_type="audio/mpeg",
-        filename="audio.mp3",
-        background=BackgroundTasks([
-            BackgroundTask(os.remove, filename),
-            BackgroundTask(release_download_lock)
-        ])
-    )
+
+        return FileResponse(
+            filename,
+            media_type="audio/mpeg",
+            filename="audio.mp3",
+            background=BackgroundTasks([
+                BackgroundTask(os.remove, filename),
+                BackgroundTask(release_download_lock)
+            ])
+        )
+
     # WAV
-    if format == "wav":
+    elif format == "wav":
         output = os.path.join(
             DOWNLOAD_DIR,
             file_id + ".%(ext)s"
@@ -234,7 +236,6 @@ async def download(
             "format": "bestaudio/best",
             "outtmpl": output,
             "noplaylist": True,
-            "proxy": YOUTUBE_PROXY,
             "cookiefile": COOKIE_FILE,
             "remote_components": {"ejs:github"},
             "postprocessors": [
@@ -245,8 +246,28 @@ async def download(
             ],
         }
 
-        with yt_dlp.YoutubeDL(options) as ydl:
-            ydl.extract_info(url, download=True)
+        proxies = [YOUTUBE_PROXY, YOUTUBE_PROXY_BACKUP]
+        downloaded = False
+
+        for proxy in proxies:
+            if not proxy:
+                continue
+
+            try:
+                options["proxy"] = proxy
+
+                with yt_dlp.YoutubeDL(options) as ydl:
+                    ydl.extract_info(url, download=True)
+
+                downloaded = True
+                break
+
+            except Exception as e:
+                print("PROXY DOWNLOAD ERROR:", repr(e), flush=True)
+                continue
+
+        if not downloaded:
+            raise Exception("All proxies failed")
 
         filename = os.path.join(
             DOWNLOAD_DIR,
@@ -254,11 +275,11 @@ async def download(
         )
 
         return FileResponse(
-    filename,
-    media_type="audio/wav",
-    filename="audio.wav",
-    background=BackgroundTasks([
-        BackgroundTask(os.remove, filename),
-        BackgroundTask(release_download_lock)
-    ])
-) 
+            filename,
+            media_type="audio/wav",
+            filename="audio.wav",
+            background=BackgroundTasks([
+                BackgroundTask(os.remove, filename),
+                BackgroundTask(release_download_lock)
+            ])
+        )
