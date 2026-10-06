@@ -191,21 +191,23 @@ async def download(
         proxies = [YOUTUBE_PROXY, YOUTUBE_PROXY_BACKUP]
         downloaded = False
 
-        for proxy in proxies:
-            if not proxy:
-                continue
+    for proxy in proxies:
+        if not proxy:
+            continue
 
-            try:
-                options["proxy"] = proxy
+        try:
+            options["proxy"] = proxy
 
-                with yt_dlp.YoutubeDL(options) as ydl:
-                    ydl.extract_info(url, download=True)
+            with yt_dlp.YoutubeDL(options) as ydl:
+                ydl.extract_info(url, download=True)
 
-                downloaded = True
-                break
-            except Exception:
-                continue
+            downloaded = True
+            break
 
+        except Exception as e:
+            print("PROXY DOWNLOAD ERROR:", repr(e), flush=True)
+            continue
+           
         if not downloaded:
             raise Exception("All proxies failed")
         filename = os.path.join(
