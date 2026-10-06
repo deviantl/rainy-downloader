@@ -175,9 +175,26 @@ def download(
             ],
         }
 
-        with yt_dlp.YoutubeDL(options) as ydl:
-            ydl.extract_info(url, download=True)
+        proxies = [YOUTUBE_PROXY, YOUTUBE_PROXY_BACKUP]
+        downloaded = False
 
+        for proxy in proxies:
+            if not proxy:
+                continue
+
+            try:
+                options["proxy"] = proxy
+
+                with yt_dlp.YoutubeDL(options) as ydl:
+                    ydl.extract_info(url, download=True)
+
+                downloaded = True
+                break
+            except Exception:
+                continue
+
+        if not downloaded:
+            raise Exception("All proxies failed")
         filename = os.path.join(
             DOWNLOAD_DIR,
             file_id + ".mp3"
