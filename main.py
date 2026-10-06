@@ -283,3 +283,20 @@ async def download(
                 BackgroundTask(release_download_lock)
             ])
         )
+@app.get("/server-test")
+def server_test():
+    import urllib.request
+
+    try:
+        response = urllib.request.urlopen(
+            "https://www.youtube.com/",
+            timeout=15
+        )
+        return {
+            "status": response.status,
+            "server": "Render can reach YouTube"
+        }
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
