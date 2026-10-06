@@ -2,15 +2,22 @@ import os
 import uuid
 import yt_dlp
 
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, BackgroundTasks
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
 
+import asyncio
 
 app = FastAPI()
+download_lock = asyncio.Lock()
+async def wait_for_download_slot():
+    await download_lock.acquire()
+def release_download_lock():
+    if download_lock.locked():
+        download_lock.release()
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -91,10 +98,11 @@ def preview(url: str = Form(...)):
 
 
 @app.post("/download")
-def download(
+async def download(
     url: str = Form(...),
     format: str = Form(...)
 ):
+    await wait_for_download_slot()
     file_id = str(uuid.uuid4())
 
     # MP4
